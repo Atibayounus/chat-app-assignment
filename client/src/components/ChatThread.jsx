@@ -31,7 +31,14 @@ export default function ChatThread({ me, other, messages, onSend }) {
         {messages.map((m) => (
           <div key={m._id} className={"bubble " + (m.from === me._id ? "out" : "in")}>
             {m.text}
-            <span className="stamp">{time(m.createdAt)}</span>
+            <span className="stamp">
+              {time(m.createdAt)}
+              {m.from === me._id && (
+                <span className={m.read ? "ticks read" : "ticks"}>
+                  {m.read ? " ✓✓" : " ✓"}
+                </span>
+              )}
+            </span>
           </div>
         ))}
         <div ref={bottom} />

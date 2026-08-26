@@ -9,29 +9,24 @@ export default function Chat({ user, onLogout }) {
   const [users, setUsers] = useState([]);
   const [activeUser, setActiveUser] = useState(null);
   const [onlineCount, setOnlineCount] = useState(0);
-  const [unread, setUnread] = useState({}); // { userId: count }
+  const [unread, setUnread] = useState({});
   const [messages, setMessages] = useState([]);
   const navigate = useNavigate();
 
-  // Load users
   useEffect(() => {
     api.get("/chat/users").then((res) => setUsers(res.data)).catch(() => {});
   }, []);
 
-  // Make sure socket is connected
   useEffect(() => {
     if (!socket.connected) socket.connect();
   }, []);
 
-  // ---------- SOCKET LISTENERS ----------
   useEffect(() => {
     socket.on("online:count", (count) => setOnlineCount(count));
 
     socket.on("chat:message", (message) => {
-      const otherPartyId =
-        message.from === user._id ? message.to : message.from;
+      const otherPartyId = message.from === user._id ? message.to : message.from;
 
-      // Add message to open chat or update unread count
       if (activeUser && otherPartyId === activeUser._id) {
         setMessages((prev) => [...prev, message]);
       } else if (message.from !== user._id) {
@@ -46,14 +41,22 @@ export default function Chat({ user, onLogout }) {
       setUnread((prev) => ({ ...prev, [userId]: count }));
     });
 
+    socket.on("chat:read:ack", ({ by }) => {
+      if (activeUser && by === activeUser._id) {
+        setMessages((prev) =>
+          prev.map((m) => (m.from === user._id ? { ...m, read: true } : m))
+        );
+      }
+    });
+
     return () => {
       socket.off("online:count");
       socket.off("chat:message");
       socket.off("chat:unread:update");
+      socket.off("chat:read:ack");
     };
   }, [activeUser]);
 
-  // Get unread messages
   useEffect(() => {
     socket.emit("chat:unread", (list) => {
       const map = {};
@@ -62,7 +65,6 @@ export default function Chat({ user, onLogout }) {
     });
   }, []);
 
-  // ---------- OPEN A CHAT ----------
   const openChat = (other) => {
     setActiveUser(other);
     setMessages([]);
@@ -75,14 +77,9 @@ export default function Chat({ user, onLogout }) {
     setUnread((prev) => ({ ...prev, [other._id]: 0 }));
   };
 
-  // ---------- SEND A MESSAGE ----------
   const sendMessage = (text) => {
     if (!text.trim() || !activeUser) return;
-
-    socket.emit("chat:send", {
-      to: activeUser._id,
-      text,
-    });
+    socket.emit("chat:send", { to: activeUser._id, text });
   };
 
   const logout = async () => {
@@ -103,7 +100,6 @@ export default function Chat({ user, onLogout }) {
         onSelect={openChat}
         onLogout={logout}
       />
-
       {activeUser ? (
         <ChatThread
           me={user}
@@ -117,9 +113,7 @@ export default function Chat({ user, onLogout }) {
             <div className="empty-icon">💬</div>
             <h3>WhatsApp Style Chat</h3>
             <p>Select a user from the left to start chatting.</p>
-            <span className="online-pill">
-              Online users: {onlineCount}
-            </span>
+            <span className="online-pill">Online users: {onlineCount}</span>
           </div>
         </div>
       )}

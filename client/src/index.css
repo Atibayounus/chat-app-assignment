@@ -459,6 +459,8 @@ body {
 .auth-card .muted a {
   color: #8d4f68;
 }
+.ticks { color: #8a8a8a; }
+.ticks.read { color: #7b1e3d; }
 /* ---------- Mobile ---------- */
 @media (max-width: 768px) {
   .app { flex-direction: column; }

@@ -6,7 +6,6 @@ const mongoose = require("mongoose");
 const Message = require("./models/Message");
 
 // userId -> number of open sockets for that user
-
 const onlineUsers = new Map();
 
 function getOnlineCount() {
@@ -73,7 +72,6 @@ function initSocket(server) {
     });
 
     // EVENT 3: chat:send
-
     socket.on("chat:send", async ({ to, text }, ack) => {
       try {
         if (!text || !text.trim()) {
@@ -105,7 +103,6 @@ function initSocket(server) {
     });
 
     // EVENT 4: chat:unread
-
     socket.on("chat:unread", async (ack) => {
       try {
         const counts = await Message.aggregate([
@@ -122,7 +119,6 @@ function initSocket(server) {
     });
 
     // EVENT 5: chat:read
-    
     socket.on("chat:read", async (fromUserId) => {
       try {
         await Message.updateMany(
@@ -131,6 +127,9 @@ function initSocket(server) {
         );
 
         io.to(userId).emit("chat:unread:update", { userId: fromUserId, count: 0 });
+
+        // Sender ko batao ke uske messages padh liye gaye — ticks blue karne ke liye.
+        io.to(fromUserId).emit("chat:read:ack", { by: userId });
       } catch (err) {
         console.error("chat:read error:", err.message);
       }
