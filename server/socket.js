@@ -1,10 +1,12 @@
 const { Server } = require("socket.io");
 const jwt = require("jsonwebtoken");
 const cookie = require("cookie");
+const mongoose = require("mongoose");
 
 const Message = require("./models/Message");
 
 // userId -> number of open sockets for that user
+
 const onlineUsers = new Map();
 
 function getOnlineCount() {
@@ -29,7 +31,6 @@ function initSocket(server) {
     },
   });
 
-  // ---- DONE FOR YOU: JWT check during the handshake ----
   io.use((socket, next) => {
     try {
       const raw = socket.handshake.headers.cookie || "";
@@ -47,59 +48,103 @@ function initSocket(server) {
   io.on("connection", (socket) => {
     const userId = socket.user.id;
 
-    // Each user joins a room named after their own id.
-    // Sending to a room means every tab of that user gets the event.
     socket.join(userId);
-
     addUser(userId);
     console.log("Connected:", userId, "| online:", getOnlineCount());
 
-    // ================= EVENT 1: online:count =================
-    // TODO (student): tell EVERY connected browser the new online count.
-    // Hint: io.emit("online:count", ...)
+    // EVENT 1: online:count
+    io.emit("online:count", getOnlineCount());
 
-    // ================= EVENT 2: chat:history =================
-    // Browser sends the other user's id and expects the old messages back.
-    // TODO (student):
-    //  1. find messages where (from = me AND to = other) OR (from = other AND to = me)
-    //  2. sort oldest first
-    //  3. send them back using the acknowledgement function
-    // socket.on("chat:history", async (withUserId, ack) => { ... });
+    // EVENT 2: chat:history
+    socket.on("chat:history", async (withUserId, ack) => {
+      try {
+        const messages = await Message.find({
+          $or: [
+            { from: userId, to: withUserId },
+            { from: withUserId, to: userId },
+          ],
+        }).sort({ createdAt: 1 });
 
-    // ================= EVENT 3: chat:send =================
-    // Browser sends { to, text }.
-    // TODO (student):
-    //  1. check text is not empty
-    //  2. save the message in MongoDB (read: false)
-    //  3. emit "chat:message" to BOTH rooms: my id and the receiver id
-    //  4. also send the new unread count to the receiver (see EVENT 6)
-    // socket.on("chat:send", async ({ to, text }, ack) => { ... });
+        ack(messages);
+      } catch (err) {
+        console.error("chat:history error:", err.message);
+        ack([]);
+      }
+    });
 
-    // ================= EVENT 4: chat:unread =================
-    // Browser asks for unread counts of all users when the page loads.
-    // TODO (student):
-    //  1. count unread messages sent TO me, grouped by sender
-    //  2. reply with a list like [{ userId, count }]
-    // socket.on("chat:unread", async (ack) => { ... });
+    // EVENT 3: chat:send
 
-    // ================= EVENT 5: chat:read =================
-    // Browser says "I opened this chat".
-    // TODO (student):
-    //  1. set read: true for messages from that user to me
-    //  2. emit "chat:unread:update" back to me with count 0
-    // socket.on("chat:read", async (fromUserId) => { ... });
+    socket.on("chat:send", async ({ to, text }, ack) => {
+      try {
+        if (!text || !text.trim()) {
+          if (ack) ack({ error: "Message is empty" });
+          return;
+        }
 
-    // ================= EVENT 6: chat:unread:update =================
-    // This one is emitted BY the server, not listened to.
-    // Send it to one user's room: io.to(receiverId).emit("chat:unread:update", { userId, count })
+        const message = await Message.create({
+          from: userId,
+          to,
+          text: text.trim(),
+          read: false,
+        });
 
-    // ================= BONUS: chat:typing =================
-    // Not saved in the database. Just forward it to the other user.
+        io.to(userId).to(to).emit("chat:message", message);
+
+        const count = await Message.countDocuments({
+          from: userId,
+          to,
+          read: false,
+        });
+        io.to(to).emit("chat:unread:update", { userId, count });
+
+        if (ack) ack({ success: true, message });
+      } catch (err) {
+        console.error("chat:send error:", err.message);
+        if (ack) ack({ error: "Could not send message" });
+      }
+    });
+
+    // EVENT 4: chat:unread
+
+    socket.on("chat:unread", async (ack) => {
+      try {
+        const counts = await Message.aggregate([
+          { $match: { to: new mongoose.Types.ObjectId(userId), read: false } },
+          { $group: { _id: "$from", count: { $sum: 1 } } },
+        ]);
+
+        const result = counts.map((c) => ({ userId: c._id.toString(), count: c.count }));
+        ack(result);
+      } catch (err) {
+        console.error("chat:unread error:", err.message);
+        ack([]);
+      }
+    });
+
+    // EVENT 5: chat:read
+    
+    socket.on("chat:read", async (fromUserId) => {
+      try {
+        await Message.updateMany(
+          { from: fromUserId, to: userId, read: false },
+          { $set: { read: true } }
+        );
+
+        io.to(userId).emit("chat:unread:update", { userId: fromUserId, count: 0 });
+      } catch (err) {
+        console.error("chat:read error:", err.message);
+      }
+    });
+
+    // BONUS: chat:typing
+    socket.on("chat:typing", ({ to }) => {
+      io.to(to).emit("chat:typing", { from: userId });
+    });
 
     socket.on("disconnect", () => {
       removeUser(userId);
       console.log("Disconnected:", userId, "| online:", getOnlineCount());
-      // TODO (student): tell everyone the new online count again.
+      io.emit("online:count", getOnlineCount());
     });
   });
 
