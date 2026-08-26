@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:6b1e3a,100:2d0f1a&height=200&section=header&text=ChatApp&fontSize=60&fontColor=ffffff&desc=WhatsApp-Style%20Real-Time%20Chat%20App&descAlignY=65&descSize=18&animation=fadeIn" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:6b1e3a,100:2d0f1a&height=260&section=header&text=ChatApp&fontSize=70&fontColor=ffffff&desc=WhatsApp-Style%20Real-Time%20Chat%20App&descAlignY=75&descSize=20&animation=fadeIn" width="100%"/>
 
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![Node.js](https://img.shields.io/badge/Node.js-6b1e3a?style=for-the-badge&logo=node.js&logoColor=white)
