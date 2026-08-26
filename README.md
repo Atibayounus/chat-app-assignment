@@ -1,32 +1,43 @@
 <div align="center">
 
-# 💬 ChatApp
-### A WhatsApp-Style Real-Time Chat Application
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:6b1e3a,100:2d0f1a&height=200&section=header&text=ChatApp&fontSize=60&fontColor=ffffff&desc=WhatsApp-Style%20Real-Time%20Chat%20App&descAlignY=65&descSize=18&animation=fadeIn" width="100%"/>
 
-![MERN](https://img.shields.io/badge/Stack-MERN-3f2a3a?style=for-the-badge)
-![Socket.IO](https://img.shields.io/badge/Realtime-Socket.IO-3f2a3a?style=for-the-badge)
-![JWT](https://img.shields.io/badge/Auth-JWT-3f2a3a?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-Complete-6b1e3a?style=for-the-badge)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Node.js](https://img.shields.io/badge/Node.js-6b1e3a?style=for-the-badge&logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
+![Socket.io](https://img.shields.io/badge/Socket.io-6b1e3a?style=for-the-badge&logo=socket.io&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
 
 Live messaging • Online presence • Unread badges • Read receipts — no refresh needed.
 
 </div>
 
 ---
-## 📸 Screenshots
-
-## 📸 Screenshots
-
-| Login | User List | Chat |
-|---|---|---|
-| ![Login](screenshots/loginpg.png) | ![User List](screenshots/userlist.png) | ![Chat](screenshots/chat.png) |
-
-| Unread Badge | Mobile View | Two Users Chatting |
-|---|---|---|
-| ![Unread](screenshots/unread.png) | ![Mobile](screenshots/mobile.png) | ![Two Users](screenshots/two-users.png) |
-
 
 **Made by:** Atiba Dar
+**Instructor:** Kamran Ahsan , University of Gujrat, Hayyatian Computing Society
+## 📸 Screenshots
+
+### Login Page
+![Login](screenshots/loginpg.png)
+
+### User List
+![User List](screenshots/userlist.png)
+
+### Chat Window
+![Chat](screenshots/chat.png)
+
+### Unread Badges
+![Unread](screenshots/unread.png)
+
+### Mobile View
+![Mobile](screenshots/mobile.png)
+
+### Two Users Chatting
+![Two Users](screenshots/two-users.png)
+
+**Made by:** Atiba Dar <br>
 **Instructor:** Kamran Ahsan — University of Gujrat, Hayyatian Computing Society
 
 ---
