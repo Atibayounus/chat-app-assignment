@@ -1,79 +1,108 @@
-# WhatsApp Style Chat App — Starter
+<div align="center">
 
-Starter code for the chat assignment. Login, user list and the socket connection
-are already working. **The chat events are your job.** Look for `TODO (student)`.
+# 💬 ChatApp
+### A WhatsApp-Style Real-Time Chat Application
 
-## What is already done
+![MERN](https://img.shields.io/badge/Stack-MERN-3f2a3a?style=for-the-badge)
+![Socket.IO](https://img.shields.io/badge/Realtime-Socket.IO-3f2a3a?style=for-the-badge)
+![JWT](https://img.shields.io/badge/Auth-JWT-3f2a3a?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Complete-6b1e3a?style=for-the-badge)
 
-- Register / Login / Logout with JWT in an httpOnly cookie
-- Protected `/chat` page
-- `GET /api/chat/users` — all users except me
-- Socket.IO server with the JWT handshake check
-- Each user joins a room named after their user id
-- Online user tracking (Map of userId -> open tabs)
-- All the CSS (WhatsApp style, responsive)
+Live messaging • Online presence • Unread badges • Read receipts — no refresh needed.
 
-## What you must build
+</div>
 
-Search the project for `TODO (student)`. There are TODOs in:
+---
+## 📸 Screenshots
 
-- `server/models/Message.js` — add the `read` field
-- `server/socket.js` — all chat events
-- `client/src/pages/Chat.jsx` — listeners, open chat, send message
+## 📸 Screenshots
 
-### Events to build
+| Login | User List | Chat |
+|---|---|---|
+| ![Login](screenshots/loginpg.png) | ![User List](screenshots/userlist.png) | ![Chat](screenshots/chat.png) |
 
-| Event | Direction | Data |
-| --- | --- | --- |
-| `online:count` | server → all browsers | number |
-| `chat:history` | browser → server | other user id |
-| `chat:send` | browser → server | `{ to, text }` |
-| `chat:message` | server → both browsers | saved message |
-| `chat:unread` | browser → server | nothing |
-| `chat:read` | browser → server | other user id |
-| `chat:unread:update` | server → one browser | `{ userId, count }` |
-| `chat:typing` (bonus) | browser → server → browser | `{ to }` |
+| Unread Badge | Mobile View | Two Users Chatting |
+|---|---|---|
+| ![Unread](screenshots/unread.png) | ![Mobile](screenshots/mobile.png) | ![Two Users](screenshots/two-users.png) |
 
-## How to run
 
+**Made by:** Atiba Dar
+**Instructor:** Kamran Ahsan — University of Gujrat, Hayyatian Computing Society
+
+---
+
+## ✨ Features
+
+- 🔐 JWT auth (httpOnly cookie) — register, login, logout
+- 🟢 Live online user count
+- 💚 Real-time green "online" dot per user
+- ⚡ Instant messaging via Socket.IO — no refresh needed
+- 🗂️ Full chat history loaded from MongoDB
+- 🔴 Unread message badges that clear on open
+- ✓✓ Blue double-tick read receipts
+- 📱 Fully responsive (mobile-friendly)
+- ⌨️ Bonus: live "typing…" indicator
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Tech |
+|---|---|
+| Frontend | React (Vite) |
+| Backend | Node.js + Express |
+| Database | MongoDB + Mongoose |
+| Real-time | Socket.IO |
+| Auth | JWT in httpOnly cookie |
+
+---
+
+## 🚀 Getting Started
+
+**1. Clone the repo**
 ```bash
-# 1. Server
-cd server
-cp .env.example .env       # then edit .env
-npm install
-npm run dev                # http://localhost:3000
-
-# 2. Client (new terminal)
-cd client
-cp .env.example .env
-npm install
-npm run dev                # http://localhost:5173
+git clone https://github.com/Atibayounus/chat-app-assignment.git
+cd chat-app-assignment
 ```
 
-MongoDB must be running, locally or on Atlas.
+**2. Setup the server**
+```bash
+cd server
+npm install
+cp .env.example .env   # fill in MONGO_URI, JWT_SECRET
+npm run dev
+```
 
-## Testing
+**3. Setup the client** (in a new terminal)
+```bash
+cd client
+npm install
+cp .env.example .env
+npm run dev
+```
 
-Open a normal window and an incognito window. Register two users. Chat between them.
+**4. Open the app**
+http://localhost:5173
 
-## Rules
+Open it in two browser windows (e.g. normal + incognito) to test real-time chat between two users.
 
-- Do not push `node_modules` or `.env`
-- Minimum 6 commits with clear messages
-- Put your screenshots in the `screenshots/` folder and show them below
+---
 
-## Screenshots
+## 🔌 Socket Events
 
-| Screen | Image |
-| --- | --- |
-| Login | `screenshots/01-login.png` |
-| User list | `screenshots/02-userlist.png` |
-| Chat | `screenshots/03-chat.png` |
-| Unread badge | `screenshots/04-unread.png` |
-| Mobile | `screenshots/05-mobile.png` |
-| Two users | `screenshots/06-two-users.png` |
+| Event | Direction | Payload | Purpose |
+|---|---|---|---|
+| `connection` | client → server (auto) | — | Marks user online via JWT cookie |
+| `disconnect` | client → server (auto) | — | Removes user from online list |
+| `online:count` | server → all | `number` | Live online user count |
+| `chat:history` | client → server | `otherUserId` | Fetches full message history |
+| `chat:send` | client → server | `{ to, text }` | Sends and saves a new message |
+| `chat:message` | server → both | `message` | Delivers message instantly |
+| `chat:unread` | client → server | — | Gets unread count per user on load |
+| `chat:read` | client → server | `otherUserId` | Marks messages as read |
+| `chat:unread:update` | server → one | `{ userId, count }` | Live badge update |
+| `chat:read:ack` | server → sender | `{ by }` | Turns ticks blue on read |
+| `chat:typing` (bonus) | client → server → client | `{ to }` | Live typing indicator |
 
-## Submit
+---
 
-https://student-tracking-portal.vercel.app/ → enter roll number → View Progress →
-enter email → Verify & Continue → Week #8 → paste your public GitHub URL → Submit.
