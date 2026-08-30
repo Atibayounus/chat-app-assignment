@@ -6,7 +6,7 @@ const cookieOptions = {
   httpOnly: true,
   sameSite: "lax",
   secure: false, // set true only on https
-  maxAge: 7 * 24 * 60 * 60 * 1000,
+  maxAge: 7 * 24 * 60 * 60 * 1000, // to convert to milliseconds
 };
 
 function sign(user) {
@@ -14,7 +14,9 @@ function sign(user) {
     expiresIn: "7d",
   });
 }
-
+//function is used to create a JWT token for the user.
+//  It takes the user object as an argument and returns a signed token 
+// that contains the user's ID.
 exports.register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
